@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Micro:bit 5x5</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --btn-bg: #0284c7;
+            --btn-hover: #0ea5e9;
+            --success-color: #22c55e;
+            --error-color: #ef4444;
+            --led-off: #334155;
+            --led-on: #fbbf24;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            margin-bottom: 15px;
+        }
+
+        /* Menu de Navegação */
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            background-color: #1e293b;
+            padding: 8px;
+            border-radius: 12px;
+            border: 2px solid #475569;
+        }
+
+        .nav-btn {
+            background-color: #334155;
+            color: #f8fafc;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn.active {
+            background-color: var(--btn-bg);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .nav-btn:hover {
+            background-color: #475569;
+        }
+
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 900px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #475569;
+        }
+
+        .panel-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #334155;
+            min-width: 280px;
+        }
+
+        .panel-box h2 {
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #e2e8f0;
+        }
+
+        /* Campo de Legenda no Painel Livre */
+        .caption-group {
+            width: 100%;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .caption-group label {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        .caption-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 2px solid #475569;
+            background-color: #0f172a;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .caption-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Grade 5x5 */
+        .grid-5x5 {
+            display: grid;
+            grid-template-columns: repeat(5, 50px);
+            grid-template-rows: repeat(5, 50px);
+            gap: 8px;
+            background-color: #000;
+            padding: 12px;
+            border-radius: 8px;
+            border: 3px solid #64748b;
+        }
+
+        .led {
+            width: 50px;
+            height: 50px;
+            background-color: var(--led-off);
+            border-radius: 6px;
+            border: 2px solid #475569;
+            transition: all 0.2s ease;
+        }
+
+        /* LEDs do modelo (Esquerda) */
+        .model-led.active {
+            background-color: var(--led-on);
+            box-shadow: 0 0 12px var(--led-on);
+        }
+
+        /* LEDs interativos do aluno */
+        .interactive-led {
+            cursor: pointer;
+        }
+
+        .interactive-led:hover {
+            border-color: var(--accent-color);
+        }
+
+        .interactive-led.active {
+            background-color: var(--led-on);
+            box-shadow: 0 0 15px var(--led-on);
+            border-color: #fef08a;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 900px;
+            align-items: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background-color: var(--btn-bg);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--btn-hover);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #check-btn {
+            background-color: #16a34a;
+        }
+        #check-btn:hover {
+            background-color: #15803d;
+        }
+
+        #feedback {
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 30px;
+            text-align: center;
+        }
+
+        .success-text {
+            color: var(--success-color);
+        }
+
+        .error-text {
+            color: var(--error-color);
+        }
+
+        .progress-info {
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Simulador Micro:bit 5x5</h1>
+        <p class="subtitle" id="main-subtitle">Copie a figura da esquerda para o painel do micro:bit à direita!</p>
+        
+        <!-- Menu de Navegação -->
+        <div class="nav-menu">
+            <button class="nav-btn active" id="btn-mode-challenge" onclick="switchMode('challenge')">🧩 Modo Desafio (20 Figuras)</button>
+            <button class="nav-btn" id="btn-mode-free" onclick="switchMode('free')">✨ Painel Livre Editável</button>
+        </div>
+
+        <div class="progress-info" id="progress-indicator">Figura 1 de 20</div>
+    </header>
+
+    <!-- Seção do Modo Desafio -->
+    <div id="challenge-view" style="display: contents;">
+        <div class="main-container">
+            <!-- Lado Esquerdo: Modelo -->
+            <div class="panel-box">
+                <h2>Modelo a Copiar</h2>
+                <div id="model-grid" class="grid-5x5"></div>
+            </div>
+
+            <!-- Lado Direito: Placa Micro:bit Simulada -->
+            <div class="panel-box" style="border-color: #0284c7;">
+                <h2>Painel Micro:bit</h2>
+                <div id="student-grid" class="grid-5x5"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div id="feedback"></div>
+            <div class="btn-group">
+                <button onclick="prevFigure()">⬅️ Anterior</button>
+                <button id="check-btn" onclick="checkAnswer()">✨ Verificar Resposta</button>
+                <button onclick="clearStudentGrid()">🧹 Limpar Painel</button>
+                <button onclick="nextFigure()">Próxima ➡️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção do Painel Livre Editável (Centralizado) -->
+    <div id="free-view" class="main-container hidden">
+        <div class="panel-box" style="border-color: #16a34a; min-width: 320px;">
+            <h2>Painel Livre Micro:bit</h2>
+            
+            <!-- Campo de Legenda -->
+            <div class="caption-group">
+                <label for="drawing-caption">Legenda / Nome do Desenho:</label>
+                <input type="text" id="drawing-caption" class="caption-input" placeholder="Ex: Gato, Sorriso, Casa...">
+            </div>
+
+            <div id="free-grid" class="grid-5x5"></div>
+            
+            <div class="controls" style="margin-top: 15px;">
+                <div class="btn-group">
+                    <button style="background-color: #16a34a;" onclick="exportToPNG()">📥 Baixar em PNG (Papel Quadriculado)</button>
+                    <button style="background-color: #dc2626;" onclick="clearFreeGrid()">🧹 Limpar Desenho</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 20 figuras em matrizes binárias 5x5 (1 = aceso, 0 = apagado)
+        const figures = [
+            [[0,1,0,1,0],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]], // 1. Coração
+            [[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1]], // 2. Xis / Cruz
+            [[0,0,0,0,0],[1,0,1,0,1],[0,0,0,0,0],[1,0,0,0,1],[0,1,1,1,0]], // 3. Sorriso
+            [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1],[1,0,1,0,1]], // 4. Casa
+            [[0,0,1,0,0],[0,1,1,1,0],[1,0,1,0,1],[0,0,1,0,0],[0,0,1,0,0]], // 5. Seta Cima
+            [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]], // 6. Diamante
+            [[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]], // 7. Quadrado
+            [[0,1,1,1,0],[1,0,0,0,1],[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1]], // 8. Letra A
+            [[0,1,1,1,0],[1,0,1,0,1],[1,1,1,1,1],[0,1,0,1,0],[0,1,0,1,0]], // 9. Robô
+            [[0,0,1,1,0],[0,1,1,0,0],[1,1,1,0,0],[0,0,1,1,0],[0,0,1,0,0]], // 10. Relâmpago
+            [[1,0,0,0,1],[0,0,0,0,0],[0,0,1,0,0],[1,0,0,0,0],[0,1,1,1,0]], // 11. Piscando
+            [[0,0,1,1,0],[0,1,1,1,1],[0,0,1,1,0],[1,1,1,1,1],[0,1,0,1,0]], // 12. Pato
+            [[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1]], // 13. Vetor
+            [[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1]], // 14. Onda
+            [[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[1,0,1,0,1]], // 15. Fantasma
+            [[0,0,1,0,0],[0,1,0,1,0],[0,1,0,1,0],[1,1,1,1,1],[0,0,0,0,0]], // 16. Triângulo
+            [[1,0,1,0,1],[1,1,1,1,1],[0,1,1,1,0],[0,1,1,1,0],[1,1,1,1,1]], // 17. Castelo
+            [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[1,1,1,1,1],[0,1,0,1,0]], // 18. Flor
+            [[0,0,1,0,0],[0,0,1,0,0],[1,0,1,0,1],[0,1,1,1,0],[0,0,1,0,0]], // 19. Seta Baixo
+            [[1,0,1,0,1],[0,1,0,1,0],[1,0,1,0,1],[0,1,0,1,0],[1,0,1,0,1]]  // 20. Xadrez
+        ];
+
+        let currentIndex = 0;
+        let studentState = Array(5).fill().map(() => Array(5).fill(0));
+        let freeState = Array(5).fill().map(() => Array(5).fill(0));
+
+        const modelGridEl = document.getElementById('model-grid');
+        const studentGridEl = document.getElementById('student-grid');
+        const freeGridEl = document.getElementById('free-grid');
+        const feedbackEl = document.getElementById('feedback');
+        const progressEl = document.getElementById('progress-indicator');
+        const subtitleEl = document.getElementById('main-subtitle');
+        
+        const challengeView = document.getElementById('challenge-view');
+        const freeView = document.getElementById('free-view');
+        const btnChallenge = document.getElementById('btn-mode-challenge');
+        const btnFree = document.getElementById('btn-mode-free');
+
+        function switchMode(mode) {
+            if (mode === 'challenge') {
+                challengeView.style.display = 'contents';
+                freeView.classList.add('hidden');
+                btnChallenge.classList.add('active');
+                btnFree.classList.remove('active');
+                progressEl.style.display = 'block';
+                subtitleEl.textContent = 'Copie a figura da esquerda para o painel do micro:bit à direita!';
+            } else {
+                challengeView.style.display = 'none';
+                freeView.classList.remove('hidden');
+                btnFree.classList.add('active');
+                btnChallenge.classList.remove('active');
+                progressEl.style.display = 'none';
+                subtitleEl.textContent = 'Crie seus próprios desenhos livres e adicione legendas!';
+                renderFree();
+            }
+        }
+
+        function renderModel() {
+            modelGridEl.innerHTML = '';
+            const currentFigure = figures[currentIndex];
+            for (let r = 0; r < 5; r++) {
+                for (let c = 0; c < 5; c++) {
+                    const led = document.createElement('div');
+                    led.className = `led model-led ${currentFigure[r][c] === 1 ? 'active' : ''}`;
+                    modelGridEl.appendChild(led);
+                }
+            }
+        }
+
+        function renderStudent() {
+            studentGridEl.innerHTML = '';
+            for (let r = 0; r < 5; r++) {
+                for (let c = 0; c < 5; c++) {
+                    const led = document.createElement('div');
+                    led.className = `led interactive-led ${studentState[r][c] === 1 ? 'active' : ''}`;
+                    led.addEventListener('click', () => {
+                        studentState[r][c] = studentState[r][c] === 1 ? 0 : 1;
+                        feedbackEl.textContent = '';
+                        renderStudent();
+                    });
+                    studentGridEl.appendChild(led);
+                }
+            }
+        }
+
+        function renderFree() {
+            freeGridEl.innerHTML = '';
+            for (let r = 0; r < 5; r++) {
+                for (let c = 0; c < 5; c++) {
+                    const led = document.createElement('div');
+                    led.className = `led interactive-led ${freeState[r][c] === 1 ? 'active' : ''}`;
+                    led.addEventListener('click', () => {
+                        freeState[r][c] = freeState[r][c] === 1 ? 0 : 1;
+                        renderFree();
+                    });
+                    freeGridEl.appendChild(led);
+                }
+            }
+        }
+
+        function clearStudentGrid() {
+            studentState = Array(5).fill().map(() => Array(5).fill(0));
+            feedbackEl.textContent = '';
+            renderStudent();
+        }
+
+        function clearFreeGrid() {
+            freeState = Array(5).fill().map(() => Array(5).fill(0));
+            document.getElementById('drawing-caption').value = '';
+            renderFree();
+        }
+
+        function checkAnswer() {
+            const currentFigure = figures[currentIndex];
+            let isCorrect = true;
+            for (let r = 0; r < 5; r++) {
+                for (let c = 0; c < 5; c++) {
+                    if (currentFigure[r][c] !== studentState[r][c]) {
+                        isCorrect = false;
+                        break;
+                    }
+                }
+            }
+
+            if (isCorrect) {
+                feedbackEl.innerHTML = "🎉 Parabéns! Você acertou a figura!";
+                feedbackEl.className = "success-text";
+            } else {
+                feedbackEl.innerHTML = "⚠️ Quase lá! Compare com atenção e tente ajustar os LEDs.";
+                feedbackEl.className = "error-text";
+            }
+        }
+
+        function updateProgress() {
+            progressEl.textContent = `Figura ${currentIndex + 1} de ${figures.length}`;
+        }
+
+        function nextFigure() {
+            if (currentIndex < figures.length - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            clearStudentGrid();
+            renderModel();
+            updateProgress();
+        }
+
+        function prevFigure() {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = figures.length - 1;
+            }
+            clearStudentGrid();
+            renderModel();
+            updateProgress();
+        }
+
+        // Função otimizada: Exporta em PNG com fundo branco, estilo papel quadriculado e perfeitamente centralizado
+        function exportToPNG() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Dimensões do cartão de exportação
+            canvas.width = 460;
+            canvas.height = 500;
+
+            // Fundo Branco (Estilo Papel)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Borda externa elegante e limpa
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+            // Título Principal
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 22px Segoe UI, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Painel Micro:bit 5x5', canvas.width / 2, 50);
+
+            // Obter Legenda Digitada
+            let caption = document.getElementById('drawing-caption').value.trim();
+            if (!caption) {
+                caption = 'Sem legenda';
+            }
+
+            // Exibir Legenda
+            ctx.fillStyle = '#334155';
+            ctx.font = 'bold 16px Segoe UI, sans-serif';
+            ctx.fillText(`Legenda: ${caption}`, canvas.width / 2, 85);
+
+            // Dimensões da Grade para Centralização Perfeita
+            const cellSize = 52;
+            const gap = 8;
+            const gridTotalSize = (5 * cellSize) + (4 * gap); // Tamanho total da matriz
+            const gridX = (canvas.width - gridTotalSize) / 2;  // Centralizado horizontalmente
+            const gridY = 120;                                 // Posicionado abaixo do título
+
+            // Fundo da grade (estilo papel quadriculado claro)
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(gridX - 12, gridY - 12, gridTotalSize + 24, gridTotalSize + 24);
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(gridX - 12, gridY - 12, gridTotalSize + 24, gridTotalSize + 24);
+
+            // Desenhar as células (LEDs)
+            for (let r = 0; r < 5; r++) {
+                for (let c = 0; c < 5; c++) {
+                    const x = gridX + c * (cellSize + gap);
+                    const y = gridY + r * (cellSize + gap);
+
+                    // Célula: Se LED ativado (1) = quadrado preto cheio, senão = fundo branco/quadriculado com borda cinza
+                    if (freeState[r][c] === 1) {
+                        ctx.fillStyle = '#0f172a'; // LED Aceso (Preto forte)
+                        ctx.beginPath();
+                        ctx.roundRect(x, y, cellSize, cellSize, 8);
+                        ctx.fill();
+                    } else {
+                        ctx.fillStyle = '#ffffff'; // LED Apagado (Branco limpo)
+                        ctx.beginPath();
+                        ctx.roundRect(x, y, cellSize, cellSize, 8);
+                        ctx.fill();
+                        
+                        ctx.strokeStyle = '#cbd5e1'; // Borda suave da célula desligada
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Rodapé explicativo
+            ctx.fillStyle = '#64748b';
+            ctx.font = '13px Segoe UI, sans-serif';
+            ctx.fillText('Atividade de Representação Visual (Matriz 5x5)', canvas.width / 2, 475);
+
+            // Acionar Download automático da imagem PNG
+            const link = document.createElement('a');
+            link.download = `microbit-${caption.toLowerCase().replace(/\s+/g, '-')}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Inicialização
+        renderModel();
+        renderStudent();
+        updateProgress();
+    </script>
+</body>
+</html>
